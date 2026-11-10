@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">HVACService</string>
+
+    <string name="login_subtitle">Ingrese sus credenciales</string>
+    <string name="login_username_label">Usuario</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_button">Iniciar sesión</string>
+
+    <string name="login_username_required">Ingrese el usuario</string>
+    <string name="login_password_required">Ingrese la contraseña</string>
+    <string name="login_success">Datos ingresados correctamente</string>
+
+
+</resources>
