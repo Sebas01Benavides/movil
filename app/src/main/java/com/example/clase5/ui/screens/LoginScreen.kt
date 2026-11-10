@@ -1,10 +1,8 @@
 package com.example.clase5.ui.screens
 
-import androidx.compose.ui.res.stringResource
-import com.example.clase5.R
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,24 +11,28 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.clase5.R
 import com.example.clase5.ui.theme.Clase5Theme
-import com.example.clase5.ui.viewmodel.LoginViewModel
 import com.example.clase5.ui.viewmodel.LoginUiState
 import com.example.clase5.ui.viewmodel.LoginValidationError
+import com.example.clase5.ui.viewmodel.LoginViewModel
 
 @Composable
 fun LoginRoute(
@@ -44,6 +46,8 @@ fun LoginRoute(
         onUsernameChange = viewModel::onUsernameChange,
         onPasswordChange = viewModel::onPasswordChange,
         onLoginClick = viewModel::validateInput,
+        onSaveUserClick = viewModel::saveUser,
+        onFindUserClick = viewModel::findUserByEmail,
     )
 }
 
@@ -54,6 +58,8 @@ fun LoginScreen(
     onUsernameChange: (String) -> Unit = {},
     onPasswordChange: (String) -> Unit = {},
     onLoginClick: () -> Unit = {},
+    onSaveUserClick: () -> Unit = {},
+    onFindUserClick: () -> Unit = {},
 ) {
     val errorMessage = when (uiState.validationError) {
         LoginValidationError.USERNAME_REQUIRED -> stringResource(R.string.login_username_required)
@@ -144,6 +150,40 @@ fun LoginScreen(
                     )
                 }
 
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        onClick = onSaveUserClick,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(size = 8.dp),
+                    ) {
+                        Text(text = "Guardar (Room)")
+                    }
+
+                    OutlinedButton(
+                        onClick = onFindUserClick,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(size = 8.dp),
+                    ) {
+                        Text(text = "Buscar (Room)")
+                    }
+                }
+
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+                }
+
+                if (uiState.searchResult != null) {
+                    Text(
+                        text = uiState.searchResult,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+
                 when {
                     errorMessage != null -> {
                         Text(
@@ -152,7 +192,7 @@ fun LoginScreen(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
-                    ((uiState.validationError == null) && uiState.username.isNotBlank() && uiState.password.isNotBlank()) -> {
+                    ((uiState.validationError == null) && uiState.username.isNotBlank() && uiState.password.isNotBlank() && uiState.searchResult == null) -> {
                         Text(
                             text = successMessage,
                             color = MaterialTheme.colorScheme.primary,
